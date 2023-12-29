@@ -2,7 +2,7 @@ import os
 import logging
 from telegram import Update
 from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes
-from news_api import get_last_and_next
+from project.links_extraction import get_links
 
 #Enable logging
 logging.basicConfig(
@@ -25,22 +25,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(text=follow_up_next)
 
 async def last(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    url = last
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=url)
+    next_link = get_links(0)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=next_link)
 
 async def next(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    url = next
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=url)
+    last_link = get_links(1)
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=last_link)
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
 
-
-
-if __name__ == '__main__':
+def main():
 
     TOKEN = os.environ.get("MMA_BOT_TOKEN")
-    next, last = get_last_and_next()
+
 
     application = ApplicationBuilder().token(TOKEN).build()
     
@@ -58,3 +56,8 @@ if __name__ == '__main__':
     application.add_handler(unknown_handler)
     
     application.run_polling()
+
+if __name__ == '__main__':
+    main()
+
+    
