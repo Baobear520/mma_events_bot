@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-from promotion_links import *
+from promotion_links import DOMAIN, UFC
 
 
 
@@ -46,7 +46,8 @@ def extract_all_upcoming_events_link_suffixes(url):
     response = fetch_page_content(url)
     time.sleep(2)  # 2-second delay between requests
     soup = BeautifulSoup(response.content, features='html.parser')
-    recent_tab_div = soup.find('div', class_='single_tab active', id='upcoming_tab')
+
+    recent_tab_div = soup.find('div', class_='single_tab', id='upcoming_tab')
     if recent_tab_div:
         links = []
         for item in recent_tab_div.find_all('a'):
@@ -56,21 +57,23 @@ def extract_all_upcoming_events_link_suffixes(url):
     else:
         return []
 
+
 def form_upcoming_event_link(url,num):
     try:
         events = extract_all_upcoming_events_link_suffixes(url)
         if events:
             link = DOMAIN + events[num]
             return link
+        
         else:
             return url
     except Exception as e:
         print("Error:", e)
 
 
-url = form_url(PFL)
-print(form_upcoming_event_link(url,0))
-
+if __name__ == "__main__":
+    url = DOMAIN + UFC
+    print(form_upcoming_event_link(url,0))
 
 
 
