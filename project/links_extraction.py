@@ -1,13 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
 import time
-from promotion_links import DOMAIN, UFC
+from promotion_links import UFC, PFL,ONE_FC, DOMAIN
 
+def form_url(user_response: str):
+    print(user_response) #printed /last
 
-
-def form_url(promotion):
+    if user_response == 'UFC':
+        promotion = UFC
+    elif user_response == 'PFL':
+        promotion = PFL
+    else:
+        promotion = ONE_FC
     url = DOMAIN + promotion
     return url
+
 
 def fetch_page_content(url):
 
@@ -16,12 +23,13 @@ def fetch_page_content(url):
     }
     response = requests.get(url, headers=headers)
     response.raise_for_status()
-    return response
+    content = response.content
+    return content
 
 def extract_all_recent_events_link_suffixes(url):
-    response = fetch_page_content(url)
+    content = fetch_page_content(url)
     time.sleep(2)  # 2-second delay between requests
-    soup = BeautifulSoup(response.content, features='html.parser')
+    soup = BeautifulSoup(content, features='html.parser')
     recent_tab_div = soup.find('div', class_='single_tab', id='recent_tab')
     links = []
     for item in recent_tab_div.find_all('a'):
@@ -30,12 +38,12 @@ def extract_all_recent_events_link_suffixes(url):
     return links
 
 
-def form_recent_event_link(url,num):
+def form_recent_event_link(url):
     try:
-        events = extract_all_recent_events_link_suffixes(url)
+        events = extract_all_recent_events_link_suffixes(url)[:3]
         if events:
-            link = DOMAIN + events[num]
-            return link
+            links = [link+DOMAIN for link in events]
+            return links
         else:
             return url
     except Exception as e:
@@ -58,11 +66,11 @@ def extract_all_upcoming_events_link_suffixes(url):
         return []
 
 
-def form_upcoming_event_link(url,num):
+def form_upcoming_event_link(url):
     try:
         events = extract_all_upcoming_events_link_suffixes(url)
         if events:
-            link = DOMAIN + events[num]
+            link = DOMAIN + events[:3]
             return link
         
         else:
@@ -71,9 +79,7 @@ def form_upcoming_event_link(url,num):
         print("Error:", e)
 
 
-if __name__ == "__main__":
-    url = DOMAIN + UFC
-    print(form_upcoming_event_link(url,0))
+
 
 
 
