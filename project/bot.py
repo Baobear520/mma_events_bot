@@ -16,7 +16,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-PROMOTION, COMMAND = range(2)
+
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -38,6 +38,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_promotion_choice(update: Update, context: CallbackContext):
     user_response = update.message.text  # Get the text of the selected option
     chat_id = update.effective_chat.id
+    
+    global url
+    url = form_url(user_response)
 
     # Now you can use user_response and chat_id as needed
     # For example, you might want to continue the conversation based on the user's choice
@@ -45,20 +48,24 @@ async def handle_promotion_choice(update: Update, context: CallbackContext):
     await context.bot.send_message(chat_id=chat_id, text=f"To get the link to the recent {user_response} events, send /last ")
     await context.bot.send_message(chat_id=chat_id, text=f"To get the link to the upcoming {user_response} events, send /next ")
 
+async def last(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-async def last(update: Update, context: CallbackContext):
-    user_response = update.message.text  # Get the text of the selected option
-    chat_id = update.effective_chat.id
-    message = "Select the event"
-    
-    url = form_url(user_response)
     reply_variants = [form_recent_event_link(url)]
     
+    message = "Select one of the events"
     reply_markup = ReplyKeyboardMarkup(reply_variants, one_time_keyboard=True)
-    await update.message.reply_text(text=message, reply_markup=reply_markup)
-
     
+    await update.message.reply_text(text=message,reply_markup=reply_markup)
 
+
+async def handle_last_event_choice(update: Update, context: CallbackContext):
+    user_response = update.message.text  # Get the text of the selected option
+    chat_id = update.effective_chat.id
+    
+    message = user_response
+   
+    await context.bot.send_message(chat_id=chat_id, text=message)
+   
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
@@ -70,14 +77,16 @@ def main():
 
     start_handler = CommandHandler('start', start)
     promotion_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_promotion_choice)
-    #need to handle a callback
+    
     last_handler = CommandHandler('last', last)
+    last_event_choice_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_last_event_choice)
     #next_handler = CommandHandler('next', next)
     unknown_handler = MessageHandler(filters.COMMAND, unknown)
 
     application.add_handler(start_handler)
     application.add_handler(promotion_handler)
     application.add_handler(last_handler)
+    application.add_handler(last_event_choice_handler)
     #application.add_handler(next_handler)
     application.add_handler(unknown_handler)
 

@@ -4,7 +4,6 @@ import time
 from promotion_links import UFC, PFL,ONE_FC, DOMAIN
 
 def form_url(user_response: str):
-    print(user_response) #printed /last
 
     if user_response == 'UFC':
         promotion = UFC
@@ -42,7 +41,7 @@ def form_recent_event_link(url):
     try:
         events = extract_all_recent_events_link_suffixes(url)[:3]
         if events:
-            links = [link+DOMAIN for link in events]
+            links = [DOMAIN + link for link in events]
             return links
         else:
             return url
