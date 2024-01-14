@@ -9,8 +9,11 @@ def form_url(user_response: str):
         promotion = UFC
     elif user_response == 'PFL':
         promotion = PFL
-    else:
+    elif user_response == 'ONE_FC':
         promotion = ONE_FC
+    else:
+        promotion = ''
+
     url = DOMAIN + promotion
     return url
 
@@ -37,7 +40,7 @@ def extract_all_recent_events_link_suffixes(url):
     return links
 
 
-def form_recent_event_link(url):
+def form_recent_event_links(url):
     try:
         events = extract_all_recent_events_link_suffixes(url)[:3]
         if events:
@@ -65,13 +68,12 @@ def extract_all_upcoming_events_link_suffixes(url):
         return []
 
 
-def form_upcoming_event_link(url):
+def form_upcoming_event_links(url):
     try:
         events = extract_all_upcoming_events_link_suffixes(url)
         if events:
-            link = DOMAIN + events[:3]
-            return link
-        
+            links = [DOMAIN + link for link in events]
+            return links
         else:
             return url
     except Exception as e:
