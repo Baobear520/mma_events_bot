@@ -64,16 +64,37 @@ async def last(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user = update.message.from_user
     logger.info("User %s chose /last", user.first_name)
    
-    reply_keyboard = [["1","2","3"]]
+    links = form_recent_event_links(url)
 
-    await update.message.reply_text(
-        "Choose one of these 3 events",
-        reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True, resize_keyboard=True
-        ),
-    )
+    if links and len(links) == 3:
+        reply_keyboard = [["1","2","3"]]
 
-    return LAST_EVENT
+        await update.message.reply_text(
+            "Choose one of these 3 events",
+            reply_markup=ReplyKeyboardMarkup(
+                reply_keyboard, one_time_keyboard=True, resize_keyboard=True
+            ),
+        )
+        return LAST_EVENT
+
+    elif links and len(links) == 2:
+        reply_keyboard = [["1","2"]]
+
+        await update.message.reply_text(
+    "Choose one of these 2 events",
+    reply_markup=ReplyKeyboardMarkup(
+        reply_keyboard, one_time_keyboard=True, resize_keyboard=True
+    ),
+)
+        return LAST_EVENT
+    
+    elif links and len(links) == 1:
+        await update.message.reply_text("Great! Let me get you the link to the last event.")
+        return LAST_EVENT
+    
+    else:
+        await update.message.reply_text("Sorry, there were no events in the past.")
+
 
 
 async def next(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -81,56 +102,53 @@ async def next(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     user = update.message.from_user
     logger.info("User %s chose /next", user.first_name)
     
-    reply_keyboard = [["1","2","3"]]
+    links = form_upcoming_event_links(url)
 
-    await update.message.reply_text(
-        "Choose one of these 3 events",
-        reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True, resize_keyboard=True
-        ),
-    )
+    if links and len(links) == 3:
+        reply_keyboard = [["1","2","3"]]
 
-    return NEXT_EVENT
+        await update.message.reply_text(
+            "Choose one of these 3 events",
+            reply_markup=ReplyKeyboardMarkup(
+                reply_keyboard, one_time_keyboard=True, resize_keyboard=True
+            ),
+        )
+        return NEXT_EVENT
+
+    elif links and len(links) < 2:
+        reply_keyboard = [["1","2"]]
+
+        await update.message.reply_text(
+    "Choose one of these 2 events",
+    reply_markup=ReplyKeyboardMarkup(
+        reply_keyboard, one_time_keyboard=True, resize_keyboard=True
+    ),
+)
+        return NEXT_EVENT
+    
+    elif links and len(links) == 1:
+        await update.message.reply_text("Great! Let me get you the link to the upcoming event.")
+        return NEXT_EVENT
+    
+    else:
+        await update.message.reply_text("Sorry, there are no events on the schedule.")
+
+    
 
 
 async def last_event(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """ Replies with the link to desired event """
 
-    links = form_recent_event_links(url)
-
-    if type(links) == list:
-        if update.message.text == "1":
-            link = links[0]
-        elif update.message.text == "2":
-            link = links[1]
-        else: 
-            link = links[2]
-
-        logger.info(f"Got the links to events")
-
-        await update.message.reply_text(text=f"Great! Here's the link:\n {link}")
-    else:
-        await update.message.reply_text("Sorry, there are no events on the schedule.")
+    await update.message.reply_text(text=f"Great! Here's the link:")
+    
 
 
 
 async def next_event(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Prompts user to choose one of the events."""
 
-    links = form_upcoming_event_links(url)
-    if type(links) == list:
-        if update.message.text == "1":
-            link = links[0]
-        elif update.message.text == "2":
-            link = links[1]
-        else: 
-            link = links[2]
-
-        logger.info(f"Got the links to events")
-
-        await update.message.reply_text(text=f"Great! Here's the link:\n {link}")
-    else:
-        await update.message.reply_text("Sorry, there are no events on the schedule.")
+    await update.message.reply_text(text=f"Great! Here's the link:")
+    
 
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
