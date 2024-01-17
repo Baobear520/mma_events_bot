@@ -45,8 +45,8 @@ def fetch_page_content(url):
     except Exception as e:
         logger.error(e)
 
-def extract_all_recent_events_link_suffixes(url):
-    """ Extracts all recent events dynamic links suffixes """
+def extract_events_link_suffixes(url,action):
+    """ Extracts all events dynamic links suffixes """
 
     #Fetching the html content of the page 
     content = fetch_page_content(url)
@@ -56,12 +56,17 @@ def extract_all_recent_events_link_suffixes(url):
         #Getting a soup object from the page
         soup = BeautifulSoup(content, features='html.parser')
         #Getting content within the tag
-        recent_tab_div = soup.find('div', class_='single_tab', id='recent_tab')
-        logger.info(f"Got the object.")
+        logger.info(f"the value of 'action' is {action}")
+        if action == "/last":
+            div_obj = soup.find('div', class_='single_tab', id='recent_tab')
+            logger.info("Scraped the 'recent' tab.")
+        elif action == "/next":
+            div_obj = soup.find('div', class_='single_tab', id='upcoming_tab')
+            logger.info("Scraped the 'upcoming' tab.")
 
         #Getting a list of href attrs from the "a" tag 
-        links = [item.get('href') for item in recent_tab_div.find_all('a')] 
-        logger.info(f"Got a list of recent events links ({len(links)}) .")
+        links = [item.get('href') for item in div_obj.find_all('a')] 
+        logger.info(f"Got a list of event links ({len(links)}) .")
 
         return links
     
@@ -69,90 +74,21 @@ def extract_all_recent_events_link_suffixes(url):
         logger.error(e)
 
 
-def form_recent_event_links(url):
+def form_event_links(url,action):
     """ Joins the domain name and the link suffixes to get the full url to events """
     try:
-        events = extract_all_recent_events_link_suffixes(url)
-        if events and len(events) >= 3:
-            logger.info(f"There are more than 3 recent events. Extracting the links...")
-            links = ["".join(DOMAIN + link) for link in events]
+        link_suffixes = extract_events_link_suffixes(url,action)
+        if link_suffixes:
+            links = ["".join(DOMAIN + link) for link in link_suffixes]
             logger.info(f"Extracted {len(links)} objects like '{links[0]}'")
             #Returning only 3 most recent events
-            return links[:3]
-        
-        elif events and len(events) < 3:
-            logger.info(f"There are fewer than 3 recent events. Extracting the links...")
-            links = ["".join(DOMAIN + link) for link in events]
-            logger.info(f"Extracted {links}")
-            #Returning all the existing events 
             return links
-        
         else:
-            logger.info(f"There are no recent events. Returning an empty list.")
+            logger.info(f"There are no events. Returning an empty list.")
             return []
         
-    except Exception as e:
-        print("Error:", e)
-
-
-def extract_all_upcoming_events_link_suffixes(url):
-    """ Extracts all upcoming events dynamic links suffixes """ 
-
-    #Fetching the html content of the page 
-    content = fetch_page_content(url)
-    time.sleep(2)  # 2-second delay between requests
-
-     #Getting a soup object from the page
-    soup = BeautifulSoup(content, features='html.parser')
-
-    try:
-        #Getting a soup object from the page
-        soup = BeautifulSoup(content, features='html.parser')
-        #Getting content within the tag
-        upcoming_tab_div = soup.find('div', class_='single_tab', id='upcoming_tab')
-        logger.info(f"Got the object.")
-
-        #Getting a list of href attrs from the "a" tag 
-        links = [item.get('href') for item in upcoming_tab_div.find_all('a')] 
-        logger.info(f"Got a list of upcoming events links ({len(links)}).")
-
-        return links
-    
     except Exception as e:
         logger.error(e)
-    
-
-
-def form_upcoming_event_links(url):
-    """ Joins the domain name and the link suffixes to get the full url to events """
-    try:
-        events = extract_all_upcoming_events_link_suffixes(url)
-        if events and len(events) >= 3:
-            logger.info(f"There are more than 3 upcoming events. Extracting the links...")
-            links = ["".join(DOMAIN + link) for link in events]
-            #Returning only 3 most recent events
-            return links[:3]
-        
-        elif events and len(events) < 3:
-            logger.info(f"There are fewer than 3 upcoming events. Extracting the links...")
-            links = ["".join(DOMAIN + link) for link in events]
-            #Returning all the existing events 
-            return links
-        
-        else:
-            logger.info(f"There are no upcoming events. Returning an empty list")
-            return []
-        
-    except Exception as e:
-        print("Error:", e)
-
-
-
-
-
-
-
-
 
 
 
