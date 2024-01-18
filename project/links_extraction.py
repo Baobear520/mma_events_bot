@@ -80,7 +80,7 @@ def form_event_links(url,action):
         link_suffixes = extract_events_link_suffixes(url,action)
         if link_suffixes:
             links = ["".join(DOMAIN + link) for link in link_suffixes]
-            logger.info(f"Extracted {len(links)} objects like '{links[0]}'")
+            logger.info(f"Extracted {len(links)} objects")
             #Returning only 3 most recent events
             return links
         else:

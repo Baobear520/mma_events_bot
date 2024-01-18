@@ -32,7 +32,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     reply_keyboard = [["UFC", "PFL", "ONE_FC"]]
 
     await update.message.reply_text(
-        "Hi! My name is MMA bot. I can help you to get the MMA news. "
+        "Hi! My name is MMA events bot. I can show you the results of the recent MMA events and tell you about what's coming soon.\n\n "
         "Send /cancel to stop talking to me.\n\n"
         "Which promotion do you want to get info about?",
         reply_markup=ReplyKeyboardMarkup(
@@ -111,7 +111,6 @@ async def action(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """ Replies with the link to the desired event """
 
-    logger.info("I'm running...")
     if update.message.text:
         index = int(update.message.text) - 1
         link = links[index]
@@ -125,7 +124,7 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
 
-async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Cancels and ends the conversation."""
 
     user = update.message.from_user
@@ -156,9 +155,9 @@ def main() -> None:
         states={
             PROMOTION: [MessageHandler(filters.Regex("^(UFC|ONE_FC|PFL)$"), promotion)],
             ACTION: [CommandHandler("last",action),CommandHandler("next",action)],
-            LINK: [MessageHandler(filters.TEXT,link)]
+            LINK: [MessageHandler(filters.Regex("^(1|2|3)$"),link)]
         },
-        fallbacks=[CommandHandler("cancel", cancel),MessageHandler(filters.COMMAND, unknown)],
+        fallbacks=[CommandHandler("cancel", cancel),MessageHandler(filters.ALL, unknown)],
     )
 
     application.add_handler(conv_handler)
