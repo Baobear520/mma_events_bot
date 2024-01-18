@@ -1,5 +1,6 @@
 import logging
 import os
+from dotenv import load_dotenv
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -140,8 +141,13 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 def main() -> None:
     """Run the bot."""
+    
+    #Load the env variables from .env file
+    load_dotenv()
+    #Get the MMA_BOT_TOKEN variable
+    TOKEN = os.getenv("MMA_BOT_TOKEN")
+
     # Create the Application and pass it your bot's token.
-    TOKEN = os.environ.get("MMA_BOT_TOKEN")
     application = Application.builder().token(TOKEN).build()
 
     # Add conversation handler with the states 
