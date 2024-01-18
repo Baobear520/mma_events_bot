@@ -1,6 +1,5 @@
 import logging
-import os
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
 from telegram.ext import (
@@ -143,9 +142,10 @@ def main() -> None:
     """Run the bot."""
     
     #Load the env variables from .env file
-    load_dotenv()
+    env = dotenv_values("project/.env")
+
     #Get the MMA_BOT_TOKEN variable
-    TOKEN = os.getenv("MMA_BOT_TOKEN")
+    TOKEN = env["MMA_BOT_TOKEN"]
 
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(TOKEN).build()
