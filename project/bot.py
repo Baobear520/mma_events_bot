@@ -1,4 +1,5 @@
 import logging
+import re
 from dotenv import dotenv_values
 
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
@@ -153,7 +154,7 @@ def main() -> None:
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
-            PROMOTION: [MessageHandler(filters.Regex("^(UFC|ONE_FC|PFL)$"), promotion)],
+            PROMOTION: [MessageHandler(filters.Regex(re.compile("^(UFC|ONE_FC|PFL)$",re.IGNORECASE)), promotion)],
             ACTION: [CommandHandler("last",action),CommandHandler("next",action)],
             LINK: [MessageHandler(filters.Regex("^(1|2|3)$"),link)]
         },

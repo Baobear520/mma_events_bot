@@ -12,7 +12,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def form_url(user_response: str):
-
+    user_response = user_response.upper()
     if user_response == 'UFC':
         promotion = UFC
     elif user_response == 'PFL':
