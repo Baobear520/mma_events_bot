@@ -1,0 +1,12 @@
+[Unit]
+Description=MMA events bot
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/home/mma_events_bot/venv_mma_bot/bin/python3  /home/mma_events_bot/project/bot.py
+WorkingDirectory=/home/mma_events_bot/project
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
