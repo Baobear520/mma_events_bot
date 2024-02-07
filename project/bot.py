@@ -35,7 +35,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text(
         "Hi! My name is MMA events bot. I can show you the results of the recent MMA events and tell you about what's coming soon.\n\n "
         "Send /cancel to stop talking to me.\n\n"
-        "Which promotion do you want to get info about?",
+        "Which promotion do you want to get news about?",
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard, one_time_keyboard=True, resize_keyboard=True
         ),
@@ -88,7 +88,15 @@ async def action(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             reply_keyboard = [[str(i + 1) for i in range(len(links))]]
 
             await update.message.reply_text(
-                f"Choose one of these {len(links)} events",
+                f"Choose one of these {len(links)} events:\n"
+                "\n"
+                f"Hints:\nIf 'next' is chosen:\n1 - the event happening soonest,\n"
+                f"2 - the event happening next,\n"
+                f"3 - the event happening after the event 3 (if exists).\n"
+                "\n"
+                f"If 'last'is chosen:\n1 - the most recent event,\n"
+                f"2 - the event before the event 1,\n"
+                f"3 - the event before the event 2 (if exists).",
                 reply_markup=ReplyKeyboardMarkup(
                     reply_keyboard, one_time_keyboard=True, resize_keyboard=True
                 ),
@@ -100,7 +108,15 @@ async def action(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         reply_keyboard = [["1","2","3"]]
 
         await update.message.reply_text(
-            f"Choose one of these 3 events",
+            f"Choose one of these 3 events:\n"
+            "\n"
+            f"Hints:\nIf 'next' is chosen:\n1 - the event happening soonest,\n"
+            f"2 - the event happening next,\n"
+            f"3 - the event happening after the event 3.\n"
+            "\n"
+            f"If 'last'is chosen:\n1 - the most recent event,\n"
+            f"2 - the event before the event 1,\n"
+            f"3 - the event before the event 2.",
             reply_markup=ReplyKeyboardMarkup(
                 reply_keyboard, one_time_keyboard=True, resize_keyboard=True
             ),
@@ -143,8 +159,10 @@ def main() -> None:
     
     #Load the env variables from .env file
     dir_name = os.getcwd()
-    env = dotenv_values(os.path.join(dir_name,".env"))
-
+    path_to_env = os.path.join(dir_name,".env")
+    logger.info(f"The path to .env file is {path_to_env}")
+    env = dotenv_values(path_to_env)
+    logger.info(env)
     #Get the MMA_BOT_TOKEN variable
     TOKEN = env["MMA_BOT_TOKEN"]
 
