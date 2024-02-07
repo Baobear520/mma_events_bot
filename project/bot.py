@@ -35,7 +35,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     await update.message.reply_text(
         "Hi! My name is MMA events bot. I can show you the results of the recent MMA events and tell you about what's coming soon.\n\n"
         "Send /cancel to stop talking to me.\n\n"
-        "Send /start to start a new conversation (make sure you've ended the old conversation by sendind /cancel)\n\n"
+        "Send /start to start a new conversation (make sure you've ended the old conversation by sending /cancel)\n\n"
         "Which promotion do you want to get news about?",
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard, one_time_keyboard=True, resize_keyboard=True
