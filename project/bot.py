@@ -28,13 +28,14 @@ PROMOTION, ACTION, LINK = range(3)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Starts the conversation and asks the user about their gender."""
+    """Starts the conversation and asks the user about the desired promotion."""
     
     reply_keyboard = [["UFC", "PFL", "ONE_FC"]]
 
     await update.message.reply_text(
-        "Hi! My name is MMA events bot. I can show you the results of the recent MMA events and tell you about what's coming soon.\n\n "
+        "Hi! My name is MMA events bot. I can show you the results of the recent MMA events and tell you about what's coming soon.\n\n"
         "Send /cancel to stop talking to me.\n\n"
+        "Send /start to start a new conversation (make sure you've ended the old conversation by sendind /cancel)\n\n"
         "Which promotion do you want to get news about?",
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard, one_time_keyboard=True, resize_keyboard=True
@@ -56,7 +57,7 @@ async def promotion(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     message_1 = f"To get the link to the recent {user_response} events, send /last"
     message_2 = f"To get the link to the upcoming {user_response} events, send /next"
     
-    await update.message.reply_text(text=message_1)
+    await update.message.reply_text(text=message_1,reply_markup=ReplyKeyboardRemove())
     await update.message.reply_text(text=message_2)
 
     return ACTION
@@ -114,7 +115,7 @@ async def action(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             f"2 - the event happening next,\n"
             f"3 - the event happening after the event 3.\n"
             "\n"
-            f"If 'last'is chosen:\n1 - the most recent event,\n"
+            f"If 'last' is chosen:\n1 - the most recent event,\n"
             f"2 - the event before the event 1,\n"
             f"3 - the event before the event 2.",
             reply_markup=ReplyKeyboardMarkup(
@@ -137,9 +138,19 @@ async def link(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         # This case should not occur, but handle it just in case
         await update.message.reply_text("Sorry, there was an issue. Please try again.")
 
+async def repeated_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.message.from_user
+    logger.info("User %s sent repeated start command.", user.first_name)
+    await update.message.reply_text(
+        "You shouldn't send /start when a conversation is ongoing.\n"
+        "Please follow my instructions.")
 
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
+    await context.bot.send_message(chat_id=update.effective_chat.id, 
+        text="Sorry, I didn't understand that command.\n\n"
+        "Tips:\n"
+        "If you have unfinished conversations with me, finish or send /cancel\n"
+        "If you've cleared the chat history without ending the previous conversation, send /cancel first")
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Cancels and ends the conversation."""
@@ -178,13 +189,20 @@ def main() -> None:
             ACTION: [CommandHandler("last",action),CommandHandler("next",action)],
             LINK: [MessageHandler(filters.Regex("^(1|2|3)$"),link)]
         },
-        fallbacks=[CommandHandler("cancel", cancel),MessageHandler(filters.ALL, unknown)],
+        fallbacks=[CommandHandler("cancel", cancel)]
     )
+    MessageHandler(filters.ALL, unknown)
+
+    repeated_start_handler = MessageHandler(filters.Regex(r'start'), repeated_start)
+    unknown_handler = MessageHandler(filters.ALL,unknown)
 
     application.add_handler(conv_handler)
+    application.add_handler(repeated_start_handler)
+    application.add_handler(unknown_handler)
+   
 
     # Run the bot until the user presses Ctrl-C
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    application.run_polling(allowed_updates=Update.ALL_TYPES,timeout=3)
 
 
 if __name__ == "__main__":
